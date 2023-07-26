@@ -1,6 +1,3 @@
-import React from 'react'
-
-
 
 export default function writeOut() {
 
@@ -30,11 +27,10 @@ export default function writeOut() {
 
 const typeOutText = (element: HTMLElement, text: string) => {
     const typingInterval = 30; // Adjust the typing speed as needed
-    const cursorInterval = 500; // Adjust the cursor blinking speed as needed
     const cursorChar = '|';
   
     let index = 0;
-    let isCursorVisible = true;
+    const isCursorVisible = true;
   
     const updateText = () => {
       element.textContent = text.slice(0, index) + (isCursorVisible ? cursorChar : '');
@@ -50,9 +46,5 @@ const typeOutText = (element: HTMLElement, text: string) => {
       }
     }, typingInterval);
   
-    const cursorTimer = setInterval(() => {
-      isCursorVisible = !isCursorVisible;
-      updateText();
-    }, cursorInterval);
 
 };

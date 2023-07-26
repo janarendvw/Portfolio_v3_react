@@ -1,5 +1,5 @@
 /* eslint-disable no-empty-pattern */
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import PageTitle from "../components/ui/PageTitle";
 import writeOut from "../scripts/writeOut";
 import Cube from "../components/three/Cube";
@@ -10,42 +10,6 @@ function About() {
   useEffect(() => {
     writeOut();
     parallax();
-  }, []);
-
-  useEffect(() => {
-    const scalingImage = document.getElementById("scale-image") as HTMLElement;
-    const profilePic = document.getElementById("profile-pic") as HTMLElement;
-    const flowDividers = document.getElementsByClassName(
-      "flow-divider"
-    ) as HTMLCollectionOf<HTMLElement>;
-    const fillBar = document.getElementsByClassName(
-      "fill-bar"
-    ) as HTMLCollectionOf<HTMLElement>;
-    window.addEventListener("scroll", () => {
-      const scrollProgress =
-        window.scrollY / (document.body.scrollHeight - window.innerHeight);
-
-      fillBar[0].style.height = `${scrollProgress * 100}%`;
-      fillBar[0].style.width = "100%";
-      scalingImage.style.transform = `scale(1.25) translateY(${
-        scrollProgress * -100
-      }px)`;
-      scalingImage.style.opacity = `${1 - scrollProgress}`;
-      scalingImage.style.filter = `blur(${scrollProgress * 8}px) brightness(${
-        1 + scrollProgress * 2
-      })`;
-      profilePic.style.filter = `blur(${scrollProgress * 8}px) brightness(${
-        1 + scrollProgress * 2
-      })`;
-      profilePic.style.transform = `translateY(${
-        scrollProgress * 100
-      }px) scale(1.25)`;
-      profilePic.style.opacity = `${1 - scrollProgress}`;
-
-      for (let i = 0; i < flowDividers.length; i++) {
-        flowDividers[i].style.width = `${scrollProgress * 100}%`;
-      }
-    });
   }, []);
 
   const experience = [
@@ -83,30 +47,42 @@ function About() {
     <>
       <Cube />
       <ContactModal />
-      <div className="flex flex-col bg-radial-gradient mx-10 relative min-h-[95vh]">
-        <PageTitle title="About" />
-        <div className="striped w-60 h-20 absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2 flex items-center justify-center">
-          <div className="bg-background px-2 text-center flex items-end font-Garamond italic">
-            scroll down
+      <div className="flex flex-col  mx-10 relative min-h-[100vh] pointer-events-none">
+        <PageTitle title="ABOUT" />
+        <div className="w-60 h-20 absolute left-1/2 bottom-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+          <div className="material-symbols-rounded text-6xl text-secondary">
+            arrow_downward
           </div>
         </div>
       </div>
-      <div className="py-24 my-24 flex flex-col justify-center bg-text/10">
+      <div className="py-8 flex flex-col justify-center bg-accent px-8">
+        <section className="max-w-screen-full m-auto flex flex-col w-full items-stretch gap-8">
+          
+          <div className="bg-400 max-w-xl flex flex-col m-auto mb-4 w-full text-center font-mono">
+            Nice to meet you! My name is Jan, I'm a 23 year old developer from
+            the Netherlands. I'm currently studying Open-ICT at the University
+            of Applied Sciences Utrecht. I have a passion for data engeering, 3d
+            graphics and web development.
+            <br />
+          </div>
+        </section>
+      </div>
+      <div className="py-24 flex flex-col justify-center bg-background">
         <section className="max-w-screen-xl m-auto flex flex-col w-full items-stretch gap-8">
           <h1 className="text-5xl my-12 text-center">
             These are my{" "}
-            <span className="font-Garamond italic text-6xl text-accent">
+            <span className="font-Garamond italic text-6xl bg-gradient-to-tr from-contrast to-secondary bg-center bg-clip-text text-transparent">
               skills
             </span>
           </h1>
           <div className="bg-400 max-w-screen-2xl flex flex-col m-auto mb-4 w-full">
-            <div className="flex gap-24">
+            <div className="flex-col md:flex-row flex gap-24 px-12">
               <div className="flex-1">
                 <h3 className="font-bold text-2xl uppercase scramble">
                   Graphic
                 </h3>
-                <div className="h-px w-full mt-2 mb-8 flow-divider" />
-                <ul className="my-4">
+                <div className="h-px w-full mt-2 mb-8 flow-divider bg-secondary/30" />
+                <ul className="my-4 bg-secondary/">
                   <li className="flex justify-between items-center">
                     Blender{" "}
                     <span className="opacity-50 align-middle">/'blen.dər/</span>
@@ -125,11 +101,19 @@ function About() {
                     </span>
                   </li>
                 </ul>
+                <div className=" text-accent flex-1 group">
+                  <h3 className="bg-secondary/10 flex items-center justify-between gap-4 mt-12 py-2 px-3 text-secondary cursor-pointer">
+                    Graphic projects{" "}
+                    <span className="material-symbols-rounded group-hover:translate-x-5 duration-100 ease-in-out">
+                      arrow_circle_right
+                    </span>
+                  </h3>
+                </div>
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-2xl uppercase">Web</h3>
-                <div className="h-px w-full mt-2 mb-8 flow-divider" />
-                <ul className="my-4">
+                <div className="h-px w-full mt-2 mb-8 flow-divider bg-secondary/30" />
+                <ul className="my-4 bg-secondary/">
                   <li className="flex justify-between items-center">
                     Vue <span className="opacity-50 align-middle">/vy/</span>
                   </li>
@@ -142,11 +126,19 @@ function About() {
                     <span className="opacity-50 align-middle">/svɛlt/</span>
                   </li>
                 </ul>
+                <div className=" text-accent flex-1 group">
+                  <h3 className="bg-secondary/10 flex items-center justify-between gap-4 mt-12 py-2 px-3 text-secondary cursor-pointer">
+                    Web projects{" "}
+                    <span className="material-symbols-rounded group-hover:translate-x-5 duration-100 ease-in-out">
+                      arrow_circle_right
+                    </span>
+                  </h3>
+                </div>
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-2xl uppercase scramble">Misc</h3>
-                <div className="h-px w-full mt-2 mb-8 flow-divider" />
-                <ul className="my-4">
+                <div className="h-px w-full mt-2 mb-8 flow-divider bg-secondary/30" />
+                <ul className="my-4 bg-secondary/">
                   <li className="flex justify-between items-center">
                     Three.js{" "}
                     <span className="opacity-50 align-middle">/θri'js/</span>
@@ -156,45 +148,28 @@ function About() {
                     <span className="opacity-50 align-middle">/'fɪg.mə/</span>
                   </li>
                   <li className="flex justify-between items-center">
-                    Photography
+                    GLSL
                     <span className="opacity-50 align-middle">
-                      /fə'tɒɡ.rə.fi/
+                      /'dʒiː.el.es'el/
                     </span>{" "}
                   </li>
                 </ul>
+                <div className=" text-accent flex-1 group">
+                  <h3 className="bg-secondary/10 flex items-center justify-between gap-4 mt-12 py-2 px-3 text-secondary cursor-pointer">
+                    Misc projects{" "}
+                    <span className="material-symbols-rounded group-hover:translate-x-5 duration-100 ease-in-out">
+                      arrow_circle_right
+                    </span>
+                  </h3>
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-24 w-full justify-between max-w-screen-xl m-auto">
-            <div className=" text-accent flex-1 group">
-              <h3 className=" flex items-center justify-start gap-4 py-8">
-                Graphic projects{" "}
-                <span className="material-symbols-rounded group-hover:translate-x-5 duration-100 ease-in-out">
-                  arrow_right_alt
-                </span>
-              </h3>
-            </div>
-            <div className=" text-accent flex-1 group">
-              <h3 className=" flex items-center justify-start gap-4 py-8">
-                Web projects{" "}
-                <span className="material-symbols-rounded group-hover:translate-x-5 duration-100 ease-in-out">
-                  arrow_right_alt
-                </span>
-              </h3>
-            </div>
-            <div className=" text-accent flex-1 group">
-              <h3 className=" flex items-center justify-start gap-4 py-8">
-                Misc projects{" "}
-                <span className="material-symbols-rounded group-hover:translate-x-5 duration-100 ease-in-out">
-                  arrow_right_alt
-                </span>
-              </h3>
-            </div>
-          </div>
+          <div className="flex flex-wrap gap-24 w-full justify-between max-w-screen-xl m-auto"></div>
         </section>
       </div>
 
-      <section className="mx-12  flex flex-col items-center overflow-hidden p-24">
+      <section className="flex flex-col items-center overflow-hidden p-24 bg-black text-text">
         <h1 className="text-5xl mb-24 text-center">
           This is my
           <span className="font-Garamond italic text-6xl text-accent">
@@ -202,7 +177,7 @@ function About() {
             experience
           </span>
         </h1>
-        <div className="grid experience-grid mb-40 px-12 2xl:grid-cols-4 grid-cols-2 place-content-center place-items-center relative max-w-screen-xl font-mono">
+        <div className="grid experience-grid mb-40 mt-10 2xl:grid-cols-4 grid-cols-1 md:grid-cols-2 place-content-center place-items-center relative max-w-screen-xl font-mono">
           {experience.map((element, index) => {
             return (
               <div key={index} className="w-full h-full experience-grid-item">
@@ -215,7 +190,7 @@ function About() {
                     >
                       {element.role}
                     </h3>
-                    <p className="text-text/75 text-center font-light text-sm">
+                    <p className="opacity-70 text-center font-light text-sm">
                       {element.company}
                     </p>
                     <div className="flex gap-2 text-sm relative items-center bg-gradient-to-l border-accent/80 from-accent/30 to-transparent px-4  text-accent">

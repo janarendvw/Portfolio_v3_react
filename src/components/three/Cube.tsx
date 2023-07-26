@@ -1,100 +1,285 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { useEffect } from "react";
 import * as THREE from "three";
+//@ts-ignore
+import fragmentShader from "../../shaders/fragmentShader.frag";
+//@ts-ignore
+import vertexShader from "../../shaders/vertexShader.vert";
 import gsap from "gsap";
 
-type Props = {};
+type Parameters = {
+  count: number;
+  size: number;
+  radius: number;
+  branches: number;
+  spin: number;
+  randomness: number;
+  randomnessPower: number;
+  insideColor: string;
+  outsideColor: string;
+  camStartZ: number;
+  camStartY: number;
+};
 
-function Cube({}: Props) {
+function Cube() {
   useEffect(() => {
-    const cubeContainer = document.querySelector(".webgl") as HTMLCanvasElement;
-    if (!cubeContainer) return;
+    THREE.ColorManagement.enabled = false;
+
+    // Canvas
+    const canvas = document.querySelector("canvas.webgl");
+
+    // Scene
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    const renderer = new THREE.WebGLRenderer({
-      canvas: cubeContainer,
-      alpha: true,
-      antialias: true,
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    const points = [];
-    for (let i = 0; i < 60; i++) {
-      const x = THREE.MathUtils.randFloatSpread(10);
-      const y = THREE.MathUtils.randFloatSpread(10);
-      const z = THREE.MathUtils.randFloatSpread(20);
-      points.push(new THREE.Vector3(x, y, z));
-    }
-    const spline = new THREE.CatmullRomCurve3(points);
-    const subdivisions = 12;
-    const samples = spline.getPoints(points.length * subdivisions);
-    const geometrySpline = new THREE.BufferGeometry().setFromPoints(samples);
-    const line = new THREE.Line(
-      geometrySpline,
-      new THREE.LineDashedMaterial({
-        color: 0xffffff,
-        dashSize: 0.06,
-        gapSize: 0.1,
-        opacity: 0.3,
-        transparent: true,
-        polygonOffset: true,
-      })
-    );
-    line.computeLineDistances();
 
-    // objects.push( line );
-    scene.add(line);
+    /**
+     * Galaxy
+     */
+    const parameters: Parameters = {
+      count: 200000,
+      size: 0.005,
+      radius: 7,
+      branches: 3,
+      spin: 1,
+      randomness: 1,
+      randomnessPower: 4,
+      insideColor: "hsl(10, 100%, 60%)",
+      outsideColor: "hsl(200, 100%, 50%)",
+      camStartZ: 4,
+      camStartY: 0,
+    };
 
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    const material = new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 });
-    const pointCloud = new THREE.Points(geometry, material);
-    // const line = new THREE.Line(geometry, lineMaterial);
-    scene.add(pointCloud);
-    // scene.add(line);
-    camera.position.z = 13;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
-    renderer.render(scene, camera);
-    let scrolled = 0;
-    const handleScroll = () => {
-      scrolled = window.scrollY;
+    let geometry: THREE.BufferGeometry | null = null;
+    let material: any | null = null;
+    let points: THREE.Points | null = null;
 
-      gsap.to(camera.position, {
-        z: 13 - scrolled * 0.01,
-        ease: "molasses",
-        duration: 1,
-        onUpdate: () => {
-          renderer.render(scene, camera);
-        },
-        onComplete: () => {
-          // Animation is complete, stop rendering
-          cancelAnimationFrame(animationId);
+    const generateGalaxy = () => {
+      if (points !== null) {
+        scene.remove(points);
+
+        geometry?.dispose();
+        material?.dispose();
+      }
+
+      /**
+       * Geometry
+       */
+      geometry = new THREE.BufferGeometry();
+
+      const positions = new Float32Array(parameters.count * 3);
+      const colors = new Float32Array(parameters.count * 3);
+      const scales = new Float32Array(parameters.count * 1);
+      const randomness = new Float32Array(parameters.count * 3);
+
+      const insideColor = new THREE.Color(parameters.insideColor);
+      const outsideColor = new THREE.Color(parameters.outsideColor);
+
+      for (let i = 0; i < parameters.count; i++) {
+        const i3 = i * 3;
+
+        // Position
+        const radius = Math.random() * parameters.radius;
+
+        // const spinAngle = radius * parameters.spin;
+
+        const branchAngle =
+          ((i % parameters.branches) / parameters.branches) * Math.PI * 2;
+
+        positions[i3] = Math.cos(branchAngle) * radius;
+        positions[i3 + 1] = 0;
+        positions[i3 + 2] = Math.sin(branchAngle) * radius;
+
+        const randomX =
+          Math.pow(Math.random(), parameters.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          parameters.randomness *
+          radius;
+        const randomY =
+          Math.pow(Math.random(), parameters.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          parameters.randomness *
+          radius;
+        const randomZ =
+          Math.pow(Math.random(), parameters.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          parameters.randomness *
+          radius;
+
+        positions[i3] = randomX;
+        positions[i3 + 1] = Math.sin(randomY);
+        positions[i3 + 2] = randomZ;
+
+        // Color
+        const mixedColor = insideColor.clone();
+        mixedColor.lerp(outsideColor, radius / parameters.radius);
+
+        colors[i3] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
+
+        // Scale
+        scales[i] = Math.random();
+      }
+
+      geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3)
+      );
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute("aScale", new THREE.BufferAttribute(scales, 1));
+      geometry.setAttribute(
+        "aRandomness",
+        new THREE.BufferAttribute(randomness, 3)
+      );
+
+      /**
+       * Material
+       */
+      material = new THREE.ShaderMaterial({
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        vertexShader: vertexShader,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        fragmentShader: fragmentShader,
+        uniforms: {
+          uSize: { value: 4 * renderer.getPixelRatio() },
+          uTime: { value: 0 },
         },
       });
 
-      camera.position.z = 13 - scrolled * 0.01;
-
-      const renderLoop = () => {
-        renderer.render(scene, camera);
-        animationId = requestAnimationFrame(renderLoop);
-      };
-
-      // Start the render loop
-      let animationId = requestAnimationFrame(renderLoop);
+      /**
+       * Points
+       */
+      points = new THREE.Points(geometry, material);
+      scene.add(points);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    /**
+     * Sizes
+     */
+
+    if (canvas === null) {
+      return;
+    }
+    const sizes = {
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    };
+
+    
+
+    window.addEventListener("resize", () => {
+      // Update sizes
+      sizes.width = window.innerWidth;
+      sizes.height = window.innerHeight;
+
+      // Update camera
+      camera.aspect = sizes.width / sizes.height;
+      camera.updateProjectionMatrix();
+
+      // Update renderer
+      renderer.setSize(sizes.width, sizes.height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
+
+    /**
+     * Camera
+     */
+    // Base camera
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      sizes.width / sizes.height,
+      0.1,
+      100
+    );
+
+    camera.position.z = parameters.camStartZ;
+    camera.position.y = parameters.camStartY;
+    scene.add(camera);
+
+    /**
+     * Renderer
+     */
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+    });
+    renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    /**
+     * Animate
+     */
+
+    generateGalaxy();
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const mouseMove = (event:MouseEvent) => {
+      mouseX = event.clientX / sizes.width - 0.5;
+      mouseY = event.clientY / sizes.height - 0.5;
+
+      gsap.to(points.rotation, { 
+        duration: 3,
+        x: mouseX * 2,
+        y: -mouseY * 2,
+        ease: "power2.out",
+      });
+
+
+    };
+
+    const scroll = (event:WheelEvent) => {
+      gsap.to(camera.position, {
+        duration: 3,
+        z: camera.position.z + event.deltaY * 0.01,
+      });
+    };
+
+    window.addEventListener("wheel", scroll);
+    window.addEventListener("mousemove", mouseMove);
+
+
+
+    const clock = new THREE.Clock();
+
+    const tick = () => {
+      const elapsedTime = clock.getElapsedTime();
+
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      material.uniforms.uTime.value = elapsedTime;
+      // Render
+      renderer.render(scene, camera);
+
+      // Call tick again on the next frame
+      window.requestAnimationFrame(tick);
+
+      if (points === null) {
+        return;
+      }
+    };
+
+    tick();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      if (points !== null) {
+      scene.remove(points);
+      geometry?.dispose();
+      material.dispose();
+
+      }
+      window.removeEventListener("mousemove", mouseMove);
+      window.removeEventListener("wheel", scroll);
     };
   }, []);
 
-  return (
-    <canvas className="absolute left-1/2 top-1/2 -translate-y-[55%] -translate-x-[50%] -z-50 webgl"></canvas>
-  );
+  return <canvas className="fixed w-screen h-screen -z-50 webgl"></canvas>;
 }
 
 export default Cube;

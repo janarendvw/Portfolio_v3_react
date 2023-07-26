@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require('tailwindcss/defaultTheme')
-const accentColor = 'hsl(120, 100%, 50%)'
-const secondaryColor = 'hsl(110, 60%, 60%)'
+const accentColor = 'hsl(220, 100%, 50%)'
+const secondaryColor = 'hsl(0, 100%, 60%)'
 export default {
   content: [
     "./index.html",

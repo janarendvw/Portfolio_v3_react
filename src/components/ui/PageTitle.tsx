@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 type Props = {
     title: string
@@ -21,7 +21,7 @@ function PageTitle({ title }: Props) {
     return (
 
             <h1
-                className="bg-blue text-[15vw] text-text m-auto inline leading-none tracking-tighter"
+                className="bg-blue text-[15vw] text-text m-auto inline text-center leading-none page-title"
             >
                 {title}
             </h1>

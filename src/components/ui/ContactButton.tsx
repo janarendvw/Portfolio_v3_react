@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 function ContactButton() {
     useEffect(() => {
@@ -9,16 +9,19 @@ function ContactButton() {
                 const position = btn.getBoundingClientRect()
                 const x = e.clientX - position.left - (position.width / 2)
                 const y = e.clientY - position.top - (position.height / 2)
+                const childElement = btn.children[0] as HTMLElement;
 
-                btn.children[0].style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-                btn.children[0].style.transitionDuration = `0ms`;
+
+                childElement.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                childElement.style.transitionDuration = `0ms`;
             })
         })
         
-        btns.forEach((btn) => {
-            btn.addEventListener('mouseleave', (e) => {
-                btn.children[0].style.transform = `translate(0px, 0px)`;
-                btn.children[0].style.transitionDuration = `300ms`;
+        btns.forEach((btn: HTMLElement) => {
+            btn.addEventListener('mouseleave', () => {
+                const childElement = btn.children[0] as HTMLElement;
+                childElement.style.transform = `translate(0px, 0px)`;
+                childElement.style.transitionDuration = `300ms`;
             })
         }
         )

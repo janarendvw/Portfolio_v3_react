@@ -48,13 +48,25 @@ html {
   scroll-behavior: smooth;
   background-color: theme('colors.background');
   overflow-x: hidden;
-  cursor: none;
+  /* cursor: none; */
   font-size: 16px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+  scrollbar-width: none;
 }
+
+.page-title {
+  -webkit-text-stroke: 3px theme('colors.text');
+  color: color-mix(in srgb, theme('colors.text') 0%, transparent 90%);
+}
+
+::-webkit-scrollbar {
+  display: none;
+  scrollbar-width: none;
+}
+
+
 
 :root {
   font-size: 16px;
@@ -83,7 +95,6 @@ div, button {
 a {
   color: inherit;
   text-decoration: none;
-  cursor: none;
 }
 
 .experience-grid::before {
@@ -118,7 +129,7 @@ a {
   bottom: -50%;
 }
 .experience-grid-item-inner, .experience-grid-item {
-  border: solid 1px color-mix(in srgb, theme('colors.text') 10%, transparent 100%);
+  /* border: solid 1px color-mix(in srgb, theme('colors.text') 10%, transparent 100%); */
   border-radius: 0;
   aspect-ratio: 1;
   margin-left: -1px;
